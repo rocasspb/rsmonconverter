@@ -3,7 +3,7 @@ import java.util.*
 
 class RSMonitorReader : InputDataReader<DataLine> {
     companion object {
-        private const val LINE_LENGTH = 139
+        private const val LINE_LENGTH = 183
 
         private const val INDEX_SPEED = 0x18
         private const val INDEX_TEMP_INTAKE = 0x1d
