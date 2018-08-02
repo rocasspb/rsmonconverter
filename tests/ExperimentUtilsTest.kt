@@ -1,7 +1,7 @@
 import org.junit.Test
 
-class ConverterTest {
-    var converter = Converter()
+class ExperimentUtilsTest {
+    var experimentUtils = ExperimentUtils()
 
     @Test
     fun testFindOneByteSequence() {
@@ -10,7 +10,7 @@ class ConverterTest {
 
         val bytes = "abcabcabcadcabd".toByteArray()
 
-        converter.findSequence(bytes, sequence, 0, 3)
+        experimentUtils.findSequence(bytes, sequence, 0, 3)
     }
 
     @Test
@@ -18,7 +18,7 @@ class ConverterTest {
         val sequence = "ab".toByteArray()
         val bytes = "abcabcabcadcabd".toByteArray()
 
-        converter.findSequence(bytes, sequence, 0, 3)
+        experimentUtils.findSequence(bytes, sequence, 0, 3)
     }
 
     @Test
@@ -26,7 +26,7 @@ class ConverterTest {
         val sequence = "ab".toByteArray()
         val bytes = "abcabcabcadcabd".toByteArray()
 
-        converter.listSequences(bytes, 1, 3)
+        experimentUtils.listSequences(bytes, 1, 3)
     }
 
 }
