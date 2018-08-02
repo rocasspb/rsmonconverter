@@ -92,7 +92,7 @@ class Converter {
 
 
             val dl = DataLine()
-            dl.readFromBytes(line)
+            //dl.readFromBytes(line)
             text.append(" ")
             text.append(ANSI__YELLOW)
             text.append(dl)
