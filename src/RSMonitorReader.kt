@@ -27,11 +27,15 @@ class RSMonitorReader : InputDataReader<DataLine> {
         private const val SPEED_MAGIC_NUMBER = 1.4
     }
 
+    private var dataLogger: InputDataLogger = NullDataLogger()
+
     override fun readFromBytes(bytes: ByteArrayInputStream): List<DataLine> {
         val lineBytes = ByteArray(LINE_LENGTH)
         val resList = LinkedList<DataLine>()
         while (bytes.available() > LINE_LENGTH) {
             bytes.read(lineBytes)
+
+            dataLogger.logData(lineBytes)
 
             val throttlePercent = shortFromLittleEndian(lineBytes, INDEX_THROTTLE) / 10
             val brakePressure =  0.01 * shortFromLittleEndian(lineBytes, INDEX_BRAKE)
@@ -58,6 +62,10 @@ class RSMonitorReader : InputDataReader<DataLine> {
         }
 
         return resList
+    }
+
+    override fun setDataLogger(logger: InputDataLogger) {
+        dataLogger = logger
     }
 
     private fun shortFromLittleEndian(bytes : ByteArray, firstIndex : Int)
