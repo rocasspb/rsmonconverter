@@ -1,4 +1,4 @@
-class DiffedInputDataLogger : InputDataLogger<DataLine> {
+class DiffedInputDataLogger(override var shouldLogData: Boolean, override var shouldLogResult: Boolean) : InputDataLogger<DataLine> {
     companion object {
         const val ANSI_RESET = "\u001B[0m"
         const val ANSI__YELLOW = "\u001B[33m"
@@ -9,16 +9,23 @@ class DiffedInputDataLogger : InputDataLogger<DataLine> {
     private var i = 0
 
     override fun logResult(result: DataLine) {
+        if(!shouldLogResult)
+            return
         val text = StringBuilder()
         text.append(" ")
         text.append(ANSI__YELLOW)
         text.append(result)
         text.append(ANSI_RESET)
 
+        if(!shouldLogData)
+            text.append("\n") //kludge
+
         print(text)
     }
 
     override fun logData(bytes: ByteArray) {
+        if(!shouldLogData)
+            return
         if(oldLine == null) {
             oldLine = bytes
             printHeader(bytes.size)

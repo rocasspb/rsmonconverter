@@ -39,7 +39,7 @@ fun main(args: Array<String>) {
     val bytes = File("C:/temp/new/log1.run").readBytes()
     val stream = ByteArrayInputStream(bytes)
     val dataReader = RSMonitorReader()
-    dataReader.setDataLogger(DiffedInputDataLogger())
+    dataReader.setDataLogger(DiffedInputDataLogger(false, true))
     val converter = Converter(dataReader, stream)
     converter.readInput()
 }
