@@ -22,13 +22,20 @@ class DiffedInputDataLogger : InputDataLogger<DataLine> {
         if(oldLine == null) {
             oldLine = bytes
             printHeader(bytes.size)
+            printSingleLine(bytes)
             return
         }
 
+        printSingleLine(bytes)
+
+        oldLine = bytes.copyOf()
+    }
+
+    private fun printSingleLine(bytes: ByteArray) {
         val text = StringBuilder().append("\n")
 
         for (i in 0 until bytes.size) {
-            if(oldLine!!.size <= i) {
+            if (oldLine!!.size <= i) {
                 //todo
             }
 
@@ -36,11 +43,7 @@ class DiffedInputDataLogger : InputDataLogger<DataLine> {
         }
 
         text.append(ANSI_BLUE).append(i++).append(ANSI_RESET)
-
-
         print(text)
-
-        oldLine = bytes
     }
 
     private fun printHeader(size: Int) {
@@ -51,7 +54,7 @@ class DiffedInputDataLogger : InputDataLogger<DataLine> {
             text.append(printByte(i.toByte()))
         }
         text.append(ANSI_RESET)
-        println(text)
+        print(text)
     }
 
     private fun printColoredByte(current: Byte, old: Byte) : String {
