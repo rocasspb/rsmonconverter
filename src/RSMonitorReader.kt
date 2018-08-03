@@ -27,7 +27,7 @@ class RSMonitorReader : InputDataReader<DataLine> {
         private const val SPEED_MAGIC_NUMBER = 1.4
     }
 
-    private var dataLogger: InputDataLogger = NullDataLogger()
+    private var dataLogger: InputDataLogger<DataLine> = NullDataLogger()
 
     override fun readFromBytes(bytes: ByteArrayInputStream): List<DataLine> {
         val lineBytes = ByteArray(LINE_LENGTH)
@@ -57,14 +57,17 @@ class RSMonitorReader : InputDataReader<DataLine> {
 
             val rpm = RPM_MAGIC_NUMBER / intFromBytes(lineBytes, INDEX_RPM)
 
-            resList.add(DataLine(throttlePercent, brakePressure, steeringAngle, gear, speed, rpm,
-                    tempOil, tempCoolant, tempGearbox, tempClutch, tempIntake, gpsLat, gpsLon))
+            val dataLine = DataLine(throttlePercent, brakePressure, steeringAngle, gear, speed, rpm,
+                    tempOil, tempCoolant, tempGearbox, tempClutch, tempIntake, gpsLat, gpsLon)
+            resList.add(dataLine)
+
+            dataLogger.logResult(dataLine)
         }
 
         return resList
     }
 
-    override fun setDataLogger(logger: InputDataLogger) {
+    override fun setDataLogger(logger: InputDataLogger<DataLine>) {
         dataLogger = logger
     }
 

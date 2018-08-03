@@ -1,4 +1,4 @@
-class DiffedInputDataLOgger : InputDataLogger {
+class DiffedInputDataLogger : InputDataLogger<DataLine> {
     companion object {
         const val ANSI_RESET = "\u001B[0m"
         const val ANSI__YELLOW = "\u001B[33m"
@@ -8,36 +8,39 @@ class DiffedInputDataLOgger : InputDataLogger {
     private var oldLine: ByteArray? = null
     private var i = 0
 
-    override fun logData(line: ByteArray) {
+    override fun logResult(result: DataLine) {
+        val text = StringBuilder()
+        text.append(" ")
+        text.append(ANSI__YELLOW)
+        text.append(result)
+        text.append(ANSI_RESET)
+
+        print(text)
+    }
+
+    override fun logData(bytes: ByteArray) {
         if(oldLine == null) {
-            oldLine = line
-            printHeader(line.size)
+            oldLine = bytes
+            printHeader(bytes.size)
             return
         }
 
-        val text = StringBuilder()
+        val text = StringBuilder().append("\n")
 
-        for (i in 0 until line.size) {
+        for (i in 0 until bytes.size) {
             if(oldLine!!.size <= i) {
                 //todo
             }
 
-            text.append(printColoredByte(line[i], oldLine!![i]))
+            text.append(printColoredByte(bytes[i], oldLine!![i]))
         }
 
         text.append(ANSI_BLUE).append(i++).append(ANSI_RESET)
 
 
-        val dl = DataLine()
-        //dl.readFromBytes(line)
-        text.append(" ")
-        text.append(ANSI__YELLOW)
-        text.append(dl)
-        text.append(ANSI_RESET)
+        print(text)
 
-        println(text)
-
-        oldLine = line
+        oldLine = bytes
     }
 
     private fun printHeader(size: Int) {

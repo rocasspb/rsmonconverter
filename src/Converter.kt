@@ -1,7 +1,5 @@
 import java.io.ByteArrayInputStream
 import java.io.File
-import java.io.FileInputStream
-import javax.xml.bind.DatatypeConverter
 
 class Converter<T>(val dataReader: InputDataReader<T>, val stream: ByteArrayInputStream) {
     fun readInput() {
@@ -41,7 +39,7 @@ fun main(args: Array<String>) {
     val bytes = File("C:/temp/new/log1.run").readBytes()
     val stream = ByteArrayInputStream(bytes)
     val dataReader = RSMonitorReader()
-    dataReader.setDataLogger(DiffedInputDataLOgger())
+    dataReader.setDataLogger(DiffedInputDataLogger())
     val converter = Converter(dataReader, stream)
     converter.readInput()
 }
