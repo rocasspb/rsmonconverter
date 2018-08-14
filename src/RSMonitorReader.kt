@@ -32,6 +32,12 @@ class RSMonitorReader : InputDataReader<DataLine> {
     override fun readFromBytes(bytes: ByteArrayInputStream): List<DataLine> {
         val lineBytes = ByteArray(LINE_LENGTH)
         val resList = LinkedList<DataLine>()
+
+        var maxSpeed = 0.0
+
+        //todo this is temporary until we are not counting time in reality. We assume updates in 10Hz
+        var index = 0
+
         while (bytes.available() > LINE_LENGTH) {
             bytes.read(lineBytes)
 
@@ -41,7 +47,11 @@ class RSMonitorReader : InputDataReader<DataLine> {
             val brakePressure =  0.01 * shortFromLittleEndian(lineBytes, INDEX_BRAKE)
             val steeringAngle = shortFromLittleEndian(lineBytes, INDEX_STEERING) / 10
             val gear = lineBytes[INDEX_GEAR]
-            val speed = ((shortFromBigEndian(lineBytes, INDEX_SPEED) * SPEED_MAGIC_NUMBER / 1000).toInt())
+            val speed = (shortFromBigEndian(lineBytes, INDEX_SPEED) * SPEED_MAGIC_NUMBER / 1000)
+
+            //todo remove these temporary lines
+            if(speed > maxSpeed)
+                maxSpeed = speed
 
             val tempIntake = shortFromLittleEndian(lineBytes, INDEX_TEMP_INTAKE) / 10
             val tempCoolant = shortFromLittleEndian(lineBytes, INDEX_TEMP_COOLANT) / 10
@@ -55,10 +65,11 @@ class RSMonitorReader : InputDataReader<DataLine> {
 
             //accel.readFromlineBytes(lineBytes)
 
-            val rpm = RPM_MAGIC_NUMBER / intFromBytes(lineBytes, INDEX_RPM)
+            val rpmFromBytes = intFromBytes(lineBytes, INDEX_RPM)
+            val rpm = if(rpmFromBytes != 0) RPM_MAGIC_NUMBER / rpmFromBytes else 0
 
             val dataLine = DataLine(throttlePercent, brakePressure, steeringAngle, gear, speed, rpm,
-                    tempOil, tempCoolant, tempGearbox, tempClutch, tempIntake, gpsLat, gpsLon)
+                    tempOil, tempCoolant, tempGearbox, tempClutch, tempIntake, gpsLat, gpsLon, 0.1 * (index++))
             resList.add(dataLine)
 
             dataLogger.logResult(dataLine)
