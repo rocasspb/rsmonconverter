@@ -6,6 +6,7 @@ class RSMonitorReader : InputDataReader<DataLine> {
         private const val LINE_LENGTH = 183
 
         private const val INDEX_SPEED = 0x18
+        private const val INDEX_SPEED_HUNDREDS = 0x17
         private const val INDEX_TEMP_INTAKE = 0x1d
         private const val INDEX_TEMP_COOLANT = 0x22
         private const val INDEX_TEMP_OIL = 0x27
@@ -23,8 +24,8 @@ class RSMonitorReader : InputDataReader<DataLine> {
 
         private const val INDEX_GEAR = 0x98
 
-        private const val RPM_MAGIC_NUMBER = 1536000000 // this is divided by RPM value for reason unclear to me
-        private const val SPEED_MAGIC_NUMBER = 1.4
+        private const val MAGIC_NUMBER = 1536 //wut? ))
+        private const val SPEED_CORRECTION_MAGIC_NUMBER = 1.1 //wut? ))
     }
 
     private var dataLogger: InputDataLogger<DataLine> = NullDataLogger()
@@ -32,8 +33,6 @@ class RSMonitorReader : InputDataReader<DataLine> {
     override fun readFromBytes(bytes: ByteArrayInputStream): List<DataLine> {
         val lineBytes = ByteArray(LINE_LENGTH)
         val resList = LinkedList<DataLine>()
-
-        var maxSpeed = 0.0
 
         //todo this is temporary until we are not counting time in reality. We assume updates in 10Hz
         var index = 0
@@ -47,11 +46,10 @@ class RSMonitorReader : InputDataReader<DataLine> {
             val brakePressure =  0.01 * shortFromLittleEndian(lineBytes, INDEX_BRAKE)
             val steeringAngle = shortFromLittleEndian(lineBytes, INDEX_STEERING) / 10
             val gear = lineBytes[INDEX_GEAR]
-            val speed = (shortFromBigEndian(lineBytes, INDEX_SPEED) * SPEED_MAGIC_NUMBER / 1000)
-
-            //todo remove these temporary lines
-            if(speed > maxSpeed)
-                maxSpeed = speed
+            val speedHundreds = lineBytes[INDEX_SPEED_HUNDREDS]
+            var speed : Double = (shortFromBigEndian(lineBytes, INDEX_SPEED).toDouble() * MAGIC_NUMBER / 1000000)
+            speed += speedHundreds * 100
+            speed /= SPEED_CORRECTION_MAGIC_NUMBER
 
             val tempIntake = shortFromLittleEndian(lineBytes, INDEX_TEMP_INTAKE) / 10
             val tempCoolant = shortFromLittleEndian(lineBytes, INDEX_TEMP_COOLANT) / 10
@@ -66,7 +64,7 @@ class RSMonitorReader : InputDataReader<DataLine> {
             //accel.readFromlineBytes(lineBytes)
 
             val rpmFromBytes = intFromBytes(lineBytes, INDEX_RPM)
-            val rpm = if(rpmFromBytes != 0) RPM_MAGIC_NUMBER / rpmFromBytes else 0
+            val rpm = if(rpmFromBytes != 0) MAGIC_NUMBER * 1000000 / rpmFromBytes else 0
 
             val gpsUpdated = index % 10 == 0
 
