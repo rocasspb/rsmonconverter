@@ -25,7 +25,7 @@ class RSMonitorReader : InputDataReader<DataLine> {
         private const val INDEX_GEAR = 0x98
 
         private const val MAGIC_NUMBER = 1536 //wut? ))
-        private const val SPEED_CORRECTION_MAGIC_NUMBER = 1.1 //wut? ))
+        private const val SPEED_CORRECTION_MAGIC_NUMBER = 1.11 //wut? ))
     }
 
     private var dataLogger: InputDataLogger<DataLine> = NullDataLogger()

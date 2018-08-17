@@ -24,7 +24,9 @@ class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWrite
             //writeField(formatDoubleDefault(dataLine), output)
             writeField(formatDoubleDefault(speed), output)
             writeField(rpm.toString(), output)
-            writeField(throttlePercent.toString(), output, true)
+            writeField(throttlePercent.toString(), output)
+            writeField(formatDoubleDefault(brakePressure), output)
+            writeField(steeringAngle.toString(), output, true)
 
             /*writeField(formatDoubleDefault(dataLine.), output)
         writeField(formatDoubleDefault(dataLine), output)
@@ -56,6 +58,8 @@ class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWrite
         //writeField("\"Altitude (m)\"", output)
         writeField("\"Speed (KPH)\"", output)
         writeField("\"Engine Speed (RPM) *OBD\"", output)
-        writeField("\"Accelerator Pedal (%) *OBD\"", output, true)
+        writeField("\"Accelerator Pedal (%) *OBD\"", output)
+        writeField("\"Brake Pedal *OBD\"", output)
+        writeField("\"Steering angle *OBD\"", output, true)
     }
 }
