@@ -36,6 +36,8 @@ class RSMonitorReader : InputDataReader<DataLine> {
 
         //todo this is temporary until we are not counting time in reality. We assume updates in 10Hz
         var index = 0
+        var prevGpsLat = 0.0
+        var prevGpsLon = 0.0
 
         while (bytes.available() > LINE_LENGTH) {
             bytes.read(lineBytes)
@@ -61,12 +63,12 @@ class RSMonitorReader : InputDataReader<DataLine> {
             val gpsLat = 0.0000001 * intFromBytes(lineBytes, INDEX_GPS_LON)
             //0x65 - elevation?
 
-            //accel.readFromlineBytes(lineBytes)
+            val gpsUpdated = !(gpsLat == prevGpsLat && gpsLon == prevGpsLon)
+            prevGpsLat = gpsLat
+            prevGpsLon = gpsLon
 
             val rpmFromBytes = intFromBytes(lineBytes, INDEX_RPM)
             val rpm = if(rpmFromBytes != 0) MAGIC_NUMBER * 1000000 / rpmFromBytes else 0
-
-            val gpsUpdated = index % 10 == 0
 
             val dataLine = DataLine(throttlePercent, brakePressure, steeringAngle, gear, speed, rpm,
                     tempOil, tempCoolant, tempGearbox, tempClutch, tempIntake, gpsLat, gpsLon,
