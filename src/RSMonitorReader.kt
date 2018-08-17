@@ -5,8 +5,7 @@ class RSMonitorReader : InputDataReader<DataLine> {
     companion object {
         private const val LINE_LENGTH = 183
 
-        private const val INDEX_SPEED = 0x18
-        private const val INDEX_SPEED_HUNDREDS = 0x17
+        private const val INDEX_SPEED = 0x17
         private const val INDEX_TEMP_INTAKE = 0x1d
         private const val INDEX_TEMP_COOLANT = 0x22
         private const val INDEX_TEMP_OIL = 0x27
@@ -24,8 +23,10 @@ class RSMonitorReader : InputDataReader<DataLine> {
 
         private const val INDEX_GEAR = 0x98
 
-        private const val MAGIC_NUMBER = 1536 //wut? ))
-        private const val SPEED_CORRECTION_MAGIC_NUMBER = 1.11 //wut? ))
+        private const val INDEX_REL_TIME = 0xA9
+
+        private const val MAGIC_NUMBER = 6 //wut? ))
+        private const val SPEED_CORRECTION_MAGIC_NUMBER = 122 //wut? ))
     }
 
     private var dataLogger: InputDataLogger<DataLine> = NullDataLogger()
@@ -35,7 +36,6 @@ class RSMonitorReader : InputDataReader<DataLine> {
         val resList = LinkedList<DataLine>()
 
         //todo this is temporary until we are not counting time in reality. We assume updates in 10Hz
-        var index = 0
         var prevGpsLat = 0.0
         var prevGpsLon = 0.0
 
@@ -48,10 +48,7 @@ class RSMonitorReader : InputDataReader<DataLine> {
             val brakePressure =  0.01 * shortFromLittleEndian(lineBytes, INDEX_BRAKE)
             val steeringAngle = shortFromLittleEndian(lineBytes, INDEX_STEERING) / 10
             val gear = lineBytes[INDEX_GEAR]
-            val speedHundreds = lineBytes[INDEX_SPEED_HUNDREDS]
-            var speed : Double = (shortFromBigEndian(lineBytes, INDEX_SPEED).toDouble() * MAGIC_NUMBER / 1000000)
-            speed += speedHundreds * 100
-            speed /= SPEED_CORRECTION_MAGIC_NUMBER
+            val speed: Double = intFromThreeBytes(lineBytes, INDEX_SPEED).toDouble() / MAGIC_NUMBER / SPEED_CORRECTION_MAGIC_NUMBER
 
             val tempIntake = shortFromLittleEndian(lineBytes, INDEX_TEMP_INTAKE) / 10
             val tempCoolant = shortFromLittleEndian(lineBytes, INDEX_TEMP_COOLANT) / 10
@@ -59,20 +56,22 @@ class RSMonitorReader : InputDataReader<DataLine> {
             val tempGearbox = shortFromLittleEndian(lineBytes, INDEX_TEMP_GEARBOX) / 10
             val tempClutch = shortFromLittleEndian(lineBytes, INDEX_TEMP_CLUTCH) / 10
 
-            val gpsLon = 0.0000001 * intFromBytes(lineBytes, INDEX_GPS_LAT)
-            val gpsLat = 0.0000001 * intFromBytes(lineBytes, INDEX_GPS_LON)
+            val gpsLon = 0.0000001 * intFromFourBytes(lineBytes, INDEX_GPS_LAT)
+            val gpsLat = 0.0000001 * intFromFourBytes(lineBytes, INDEX_GPS_LON)
             //0x65 - elevation?
 
             val gpsUpdated = !(gpsLat == prevGpsLat && gpsLon == prevGpsLon)
             prevGpsLat = gpsLat
             prevGpsLon = gpsLon
 
-            val rpmFromBytes = intFromBytes(lineBytes, INDEX_RPM)
+            val rpmFromBytes = intFromThreeBytes(lineBytes, INDEX_RPM)
             val rpm = if(rpmFromBytes != 0) MAGIC_NUMBER * 1000000 / rpmFromBytes else 0
+
+            val relTime  = 0.01 * intFromThreeBytes(lineBytes, INDEX_REL_TIME)
 
             val dataLine = DataLine(throttlePercent, brakePressure, steeringAngle, gear, speed, rpm,
                     tempOil, tempCoolant, tempGearbox, tempClutch, tempIntake, gpsLat, gpsLon,
-                    0.1 * (index++), gpsUpdated)
+                    relTime, gpsUpdated)
             resList.add(dataLine)
 
             dataLogger.logResult(dataLine)
@@ -93,10 +92,14 @@ class RSMonitorReader : InputDataReader<DataLine> {
             = (((bytes[firstIndex].toInt() and 0xFF) shl 8)
             or (bytes[firstIndex + 1].toInt() and 0xFF))
 
-    private fun floatFromBytes(bytes : ByteArray, firstIndex : Int) : Float = Float.fromBits(intFromBytes(bytes, firstIndex))
+    private fun intFromThreeBytes(bytes : ByteArray, firstIndex : Int) : Int =
+            ((bytes[firstIndex].toInt() and 0xFF) shl 16) +
+            ((bytes[firstIndex + 1].toInt() and 0xFF) shl 8) +
+            (bytes[firstIndex + 2].toInt() and 0xFF)
 
-    private fun intFromBytes(bytes : ByteArray, firstIndex : Int) : Int =
+    private fun intFromFourBytes(bytes : ByteArray, firstIndex : Int) : Int =
             ((bytes[firstIndex].toInt() and 0xFF) shl 24) +
-                    ((bytes[firstIndex + 1].toInt() and 0xFF) shl 16) +
-                    ((bytes[firstIndex + 2].toInt() and 0xFF) shl 8)
+            ((bytes[firstIndex + 1].toInt() and 0xFF) shl 16) +
+            ((bytes[firstIndex + 2].toInt() and 0xFF) shl 8) +
+            (bytes[firstIndex + 3].toInt() and 0xFF)
 }

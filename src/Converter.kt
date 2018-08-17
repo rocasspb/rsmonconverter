@@ -42,8 +42,8 @@ fun main(args: Array<String>) {
     val bytes = File("C:/temp/846.run").readBytes()
     val stream = ByteArrayInputStream(bytes)
     val dataReader = RSMonitorReader()
-    //dataReader.setDataLogger(DiffedInputDataLogger(false, true))
-    val converter = Converter(dataReader, stream, RaceRenderCSVDataWriter(PrintWriter("C:/temp/out.csv")))
+    //dataReader.setDataLogger(DiffedInputDataLogger(true, true))
+    val converter = Converter(dataReader, stream, RaceRenderCSVDataWriter(PrintWriter("C:/temp/846.csv")))
     converter.apply {
         writeOutput(readInput())
     }
