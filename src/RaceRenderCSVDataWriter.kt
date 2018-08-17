@@ -47,17 +47,15 @@ class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWrite
     }
 
     private fun writeDataTableHeader(output: PrintWriter) {
-        val sb = StringBuilder()
         //todo - move to dataLine, make hashmap
-        sb.append("\"Time\"")
-        sb.append("\"GPS_Update\"")
-        sb.append("\"OBD_Update\"")
-        sb.append("\"Latitude\"")
-        sb.append("\"Longitude\"")
-        //sb.append("\"Altitude (m)\"")
-        sb.append("\"Speed (KPH)\"")
-        sb.append("\"Engine Speed (RPM) *OBD\"")
-        sb.append("\"Accelerator Pedal (%) *OBD\"")
-        output.println(sb)
+        writeField("\"Time\"", output)
+        writeField("\"GPS_Update\"", output)
+        writeField("\"OBD_Update\"", output)
+        writeField("\"Latitude\"", output)
+        writeField("\"Longitude\"", output)
+        //writeField("\"Altitude (m)\"", output)
+        writeField("\"Speed (KPH)\"", output)
+        writeField("\"Engine Speed (RPM) *OBD\"", output)
+        writeField("\"Accelerator Pedal (%) *OBD\"", output, true)
     }
 }
