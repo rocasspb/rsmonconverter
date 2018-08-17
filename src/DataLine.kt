@@ -5,7 +5,7 @@ data class DataLine(var throttlePercent : Int = 0, var brakePressure : Double = 
                     var tempCoolant: Int = 0, var tempGearbox: Int = 0,
                     var tempClutch: Int = 0, var tempIntake: Int = 0,
                     var gpsLat : Double = 0.0, var gpsLon : Double = 0.0,
-                    val relativeTime: Double = 0.0)
+                    val relativeTime: Double = 0.0, val gpsUpdate : Boolean = false)
         
 
 

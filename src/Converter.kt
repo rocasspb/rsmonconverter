@@ -1,9 +1,12 @@
 import java.io.ByteArrayInputStream
 import java.io.File
+import java.io.PrintWriter
 
-class Converter<T>(val dataReader: InputDataReader<T>, val stream: ByteArrayInputStream) {
-    fun readInput() {
-        val resList = dataReader.readFromBytes(stream)
+class Converter<T>(val dataReader: InputDataReader<T>, val stream : ByteArrayInputStream, val output: OutputDataWriter<T>) {
+    fun readInput(): List<T> = dataReader.readFromBytes(stream)
+
+    fun writeOutput(data: List<T>) {
+        output.writeDataToStream(data)
     }
 
 
@@ -36,10 +39,13 @@ class Converter<T>(val dataReader: InputDataReader<T>, val stream: ByteArrayInpu
 }
 
 fun main(args: Array<String>) {
-    val bytes = File("C:/temp/new/log1.run").readBytes()
+    val bytes = File("C:/temp/846.run").readBytes()
     val stream = ByteArrayInputStream(bytes)
     val dataReader = RSMonitorReader()
-    dataReader.setDataLogger(DiffedInputDataLogger(false, true))
-    val converter = Converter(dataReader, stream)
-    converter.readInput()
+    //dataReader.setDataLogger(DiffedInputDataLogger(false, true))
+    val converter = Converter(dataReader, stream, RaceRenderCSVDataWriter(PrintWriter("C:/temp/out.csv")))
+    converter.apply {
+        writeOutput(readInput())
+    }
+
 }

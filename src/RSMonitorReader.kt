@@ -68,8 +68,11 @@ class RSMonitorReader : InputDataReader<DataLine> {
             val rpmFromBytes = intFromBytes(lineBytes, INDEX_RPM)
             val rpm = if(rpmFromBytes != 0) RPM_MAGIC_NUMBER / rpmFromBytes else 0
 
+            val gpsUpdated = index % 10 == 0
+
             val dataLine = DataLine(throttlePercent, brakePressure, steeringAngle, gear, speed, rpm,
-                    tempOil, tempCoolant, tempGearbox, tempClutch, tempIntake, gpsLat, gpsLon, 0.1 * (index++))
+                    tempOil, tempCoolant, tempGearbox, tempClutch, tempIntake, gpsLat, gpsLon,
+                    0.1 * (index++), gpsUpdated)
             resList.add(dataLine)
 
             dataLogger.logResult(dataLine)
