@@ -39,11 +39,13 @@ class Converter<T>(val dataReader: InputDataReader<T>, val stream : ByteArrayInp
 }
 
 fun main(args: Array<String>) {
-    val bytes = File("C:/temp/846.run").readBytes()
+    if(args.size < 2)
+        throw IllegalArgumentException("Please provide input and output filenames")
+    val bytes = File(args[0]).readBytes()
     val stream = ByteArrayInputStream(bytes)
     val dataReader = RSMonitorReader()
     //dataReader.setDataLogger(DiffedInputDataLogger(true, true))
-    val converter = Converter(dataReader, stream, RaceRenderCSVDataWriter(PrintWriter("C:/temp/846.csv")))
+    val converter = Converter(dataReader, stream, RaceRenderCSVDataWriter(PrintWriter(args[1])))
     converter.apply {
         writeOutput(readInput())
     }
