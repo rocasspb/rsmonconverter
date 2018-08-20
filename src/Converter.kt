@@ -8,34 +8,6 @@ class Converter<T>(val dataReader: InputDataReader<T>, val stream : ByteArrayInp
     fun writeOutput(data: List<T>) {
         output.writeDataToStream(data)
     }
-
-
-    /*fun enlistDiffs(bytes: ByteArray, seqStart: ByteArray, limit: Int) {
-        diffLines(collectLines(bytes, seqStart, limit))
-    }
-
-    private fun collectLines(bytes: ByteArray, seqStart: ByteArray, limit: Int) : List<ByteArray> {
-        val list = LinkedList<ByteArray>()
-        var count = 0
-
-        var index = 0 //findNextSequenceStart(bytes, seqStart, 0)
-        if(index == -1)
-            return emptyList()
-
-        while(count < limit) {
-            val nextIndex = index + 183
-            if(nextIndex >= bytes.size)
-                break
-
-            list.add(bytes.copyOfRange(index, nextIndex))
-            index = nextIndex
-            count++
-        }
-        return list
-    }*/
-
-
-
 }
 
 fun main(args: Array<String>) {
