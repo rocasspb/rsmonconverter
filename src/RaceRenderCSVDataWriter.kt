@@ -1,4 +1,3 @@
-import com.sun.org.apache.xpath.internal.operations.Bool
 import java.io.PrintWriter
 
 class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWriter<DataLine>  {
