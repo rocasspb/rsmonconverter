@@ -27,13 +27,6 @@ class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWrite
             writeField(throttlePercent.toString(), output)
             writeField(formatDoubleDefault(brakePressure), output)
             writeField(steeringAngle.toString(), output, true)
-
-            /*writeField(formatDoubleDefault(dataLine.), output)
-        writeField(formatDoubleDefault(dataLine), output)
-        writeField(formatDoubleDefault(dataLine), output)
-        writeField(formatDoubleDefault(dataLine), output)
-        writeField(formatDoubleDefault(dataLine), output)
-        writeField(formatDoubleDefault(dataLine), output, true)*/
         }
     }
 
