@@ -44,3 +44,7 @@ main accepts two parameters: the filename of the original RS Monitor data log an
 ## Kudos
 - to @ravenstarter for elping me discovering some of the tricky values
 - to Mr. Sinelnikov for creating this awesome steering wheel overlay art :)
+
+## Disclaimers
+- this has only been tested with Clio RS Trophy - please send me the logs of other cars equipped with RS Monitor to check if the code works well
+- yeah, I know, the code is hacky and dirty - I will be improving it over time, but now it is in the state of a research, so this is not something I care too much
