@@ -1,4 +1,4 @@
-package output
+package com.rocasspb.rsmonconverter.output
 
 interface OutputDataWriter<D> {
     fun writeDataToStream(dataList: List<D>)

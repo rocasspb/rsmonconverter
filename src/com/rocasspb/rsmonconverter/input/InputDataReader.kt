@@ -1,6 +1,6 @@
-package input
+package com.rocasspb.rsmonconverter.input
 
-import logging.InputDataLogger
+import com.rocasspb.rsmonconverter.logging.InputDataLogger
 import java.io.ByteArrayInputStream
 
 interface InputDataReader<T> {

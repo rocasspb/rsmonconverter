@@ -1,3 +1,5 @@
+package com.rocasspb.rsmonconverter
+
 class ExperimentUtils {
     fun listSequences(bytes: ByteArray, length: Int, distance: Int) {
         for (index in 0..bytes.size - distance - length) {

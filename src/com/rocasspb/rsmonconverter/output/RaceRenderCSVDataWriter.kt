@@ -1,6 +1,6 @@
-package output
+package com.rocasspb.rsmonconverter.output
 
-import DataLine
+import com.rocasspb.rsmonconverter.DataLine
 import java.io.PrintWriter
 
 class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWriter<DataLine> {

@@ -1,3 +1,5 @@
+package com.rocasspb.rsmonconverter
+
 data class DataLine(var throttlePercent : Int = 0, var brakePressure : Double = .0,
                     var steeringAngle : Int = 0, var gear: Byte = 0,
                     var speed : Double = 0.0, var rpm: Int = 0,

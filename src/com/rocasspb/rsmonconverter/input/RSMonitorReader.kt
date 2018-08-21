@@ -1,8 +1,8 @@
-package input
+package com.rocasspb.rsmonconverter.input
 
-import DataLine
-import logging.InputDataLogger
-import logging.NullDataLogger
+import com.rocasspb.rsmonconverter.DataLine
+import com.rocasspb.rsmonconverter.logging.InputDataLogger
+import com.rocasspb.rsmonconverter.logging.NullDataLogger
 import java.io.ByteArrayInputStream
 import java.util.*
 

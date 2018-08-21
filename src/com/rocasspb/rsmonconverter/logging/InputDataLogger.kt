@@ -1,4 +1,4 @@
-package logging
+package com.rocasspb.rsmonconverter.logging
 
 interface InputDataLogger<T> {
     var shouldLogData:Boolean

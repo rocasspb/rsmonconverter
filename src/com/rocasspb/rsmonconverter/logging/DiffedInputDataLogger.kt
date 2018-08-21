@@ -1,6 +1,6 @@
-package logging
+package com.rocasspb.rsmonconverter.logging
 
-import DataLine
+import com.rocasspb.rsmonconverter.DataLine
 
 class DiffedInputDataLogger(override var shouldLogData: Boolean, override var shouldLogResult: Boolean) : InputDataLogger<DataLine> {
     companion object {
