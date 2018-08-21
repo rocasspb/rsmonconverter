@@ -1,3 +1,7 @@
+import input.InputDataReader
+import input.RSMonitorReader
+import output.OutputDataWriter
+import output.RaceRenderCSVDataWriter
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.PrintWriter
@@ -16,7 +20,7 @@ fun main(args: Array<String>) {
     val bytes = File(args[0]).readBytes()
     val stream = ByteArrayInputStream(bytes)
     val dataReader = RSMonitorReader()
-    //dataReader.setDataLogger(DiffedInputDataLogger(true, true))
+    //dataReader.setDataLogger(logging.DiffedInputDataLogger(true, true))
     val converter = Converter(dataReader, stream, RaceRenderCSVDataWriter(PrintWriter(args[1])))
     converter.apply {
         writeOutput(readInput())

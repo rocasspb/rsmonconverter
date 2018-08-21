@@ -1,4 +1,4 @@
-import java.io.ByteArrayOutputStream
+package output
 
 interface OutputDataWriter<D> {
     fun writeDataToStream(dataList: List<D>)

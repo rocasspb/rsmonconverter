@@ -1,3 +1,5 @@
+package logging
+
 interface InputDataLogger<T> {
     var shouldLogData:Boolean
     var shouldLogResult:Boolean

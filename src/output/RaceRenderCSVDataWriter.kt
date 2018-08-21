@@ -1,6 +1,9 @@
+package output
+
+import DataLine
 import java.io.PrintWriter
 
-class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWriter<DataLine>  {
+class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWriter<DataLine> {
     override fun writeDataToStream(dataList: List<DataLine>) {
         writeHeader(output)
         writeDataTableHeader(output)

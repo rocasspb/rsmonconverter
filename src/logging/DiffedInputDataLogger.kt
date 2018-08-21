@@ -1,3 +1,7 @@
+package logging
+
+import DataLine
+
 class DiffedInputDataLogger(override var shouldLogData: Boolean, override var shouldLogResult: Boolean) : InputDataLogger<DataLine> {
     companion object {
         const val ANSI_RESET = "\u001B[0m"

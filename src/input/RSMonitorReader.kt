@@ -1,3 +1,8 @@
+package input
+
+import DataLine
+import logging.InputDataLogger
+import logging.NullDataLogger
 import java.io.ByteArrayInputStream
 import java.util.*
 

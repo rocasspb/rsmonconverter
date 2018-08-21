@@ -1,3 +1,6 @@
+package input
+
+import logging.InputDataLogger
 import java.io.ByteArrayInputStream
 
 interface InputDataReader<T> {
