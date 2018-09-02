@@ -16,6 +16,7 @@ Potentially, this will allow to export the data to .VBO and load into the Circui
 - GPS Lat/Lon
 - Intake temp
 - Oil Temp
+- Coolant Temp
 - Gearbox Temp
 - Clutch Temp
 
