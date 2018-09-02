@@ -16,19 +16,24 @@ class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWrite
     }
 
     private fun writeData(dataLine: DataLine, output: PrintWriter) {
-        dataLine.apply {
+        with(dataLine) {
             writeField(formatDoubleDefault(relativeTime), output)
             writeField((if (gpsUpdate) 1 else 0).toString(), output)
 
             writeField(1.toString(), output)
             writeField(formatDoubleDefault(gpsLat, 7), output)
             writeField(formatDoubleDefault(gpsLon, 7), output)
-            //writeField(formatDoubleDefault(dataLine), output)
             writeField(formatDoubleDefault(speed), output)
             writeField(rpm.toString(), output)
             writeField(throttlePercent.toString(), output)
             writeField(formatDoubleDefault(brakePressure), output)
-            writeField(steeringAngle.toString(), output, true)
+            writeField(steeringAngle.toString(), output)
+
+            writeField(tempCoolant.toString(), output)
+            writeField(tempOil.toString(), output)
+            writeField(tempClutch.toString(), output)
+            writeField(tempGearbox.toString(), output)
+            writeField(tempIntake.toString(), output, true)
         }
     }
 
@@ -54,6 +59,12 @@ class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWrite
         writeField("\"Engine Speed (RPM) *OBD\"", output)
         writeField("\"Accelerator Pedal (%) *OBD\"", output)
         writeField("\"Brake Pedal *OBD\"", output)
-        writeField("\"Steering angle *OBD\"", output, true)
+        writeField("\"Steering angle *OBD\"", output)
+
+        writeField("\"Temp Coolant *OBD\"", output)
+        writeField("\"Temp Oil *OBD\"", output)
+        writeField("\"Temp Clutch *OBD\"", output)
+        writeField("\"Temp Gearbox *OBD\"", output)
+        writeField("\"Temp Intake *OBD\"", output, true)
     }
 }
