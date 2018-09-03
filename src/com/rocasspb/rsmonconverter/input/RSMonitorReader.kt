@@ -26,6 +26,8 @@ class RSMonitorReader : InputDataReader<DataLine> {
         private const val INDEX_GPS_LAT = 0x5c
         private const val INDEX_GPS_LON = 0x60
 
+        private const val INDEX_TEMP_EXTERNAL = 0x93
+
         private const val INDEX_GEAR = 0x98
 
         private const val INDEX_REL_TIME = 0xA9
@@ -49,17 +51,21 @@ class RSMonitorReader : InputDataReader<DataLine> {
 
             dataLogger.logData(lineBytes)
 
-            val throttlePercent = shortFromLittleEndian(lineBytes, INDEX_THROTTLE) / 10
-            val brakePressure =  0.01 * shortFromLittleEndian(lineBytes, INDEX_BRAKE)
-            val steeringAngle = shortFromLittleEndian(lineBytes, INDEX_STEERING) / 10
+            val throttlePercent = shortFromBigEndian(lineBytes, INDEX_THROTTLE) / 10
+            val brakePressure =  0.01 * shortFromBigEndian(lineBytes, INDEX_BRAKE)
+            var steeringAngle = shortFromBigEndian(lineBytes, INDEX_STEERING) / 10
+            if(Math.abs(steeringAngle) == 3276) //sometimes there is 0x0800 instead of 0. Can't figure out, why
+                steeringAngle = 0
+
             val gear = lineBytes[INDEX_GEAR]
             val speed: Double = intFromThreeBytes(lineBytes, INDEX_SPEED).toDouble() / MAGIC_NUMBER / SPEED_CORRECTION_MAGIC_NUMBER
 
-            val tempIntake = shortFromLittleEndian(lineBytes, INDEX_TEMP_INTAKE) / 10
-            val tempCoolant = shortFromLittleEndian(lineBytes, INDEX_TEMP_COOLANT) / 10
-            val tempOil = shortFromLittleEndian(lineBytes, INDEX_TEMP_OIL) / 10
-            val tempGearbox = shortFromLittleEndian(lineBytes, INDEX_TEMP_GEARBOX) / 10
-            val tempClutch = shortFromLittleEndian(lineBytes, INDEX_TEMP_CLUTCH) / 10
+            val tempIntake = shortFromBigEndian(lineBytes, INDEX_TEMP_INTAKE) / 10
+            val tempCoolant = shortFromBigEndian(lineBytes, INDEX_TEMP_COOLANT) / 10
+            val tempOil = shortFromBigEndian(lineBytes, INDEX_TEMP_OIL) / 10
+            val tempGearbox = shortFromBigEndian(lineBytes, INDEX_TEMP_GEARBOX) / 10
+            val tempClutch = shortFromBigEndian(lineBytes, INDEX_TEMP_CLUTCH) / 10
+            val tempExt = shortFromBigEndian(lineBytes, INDEX_TEMP_EXTERNAL) / 10
 
             val gpsLon = 0.0000001 * intFromFourBytes(lineBytes, INDEX_GPS_LAT)
             val gpsLat = 0.0000001 * intFromFourBytes(lineBytes, INDEX_GPS_LON)
@@ -75,7 +81,7 @@ class RSMonitorReader : InputDataReader<DataLine> {
             val relTime  = 0.01 * intFromThreeBytes(lineBytes, INDEX_REL_TIME)
 
             val dataLine = DataLine(throttlePercent, brakePressure, steeringAngle, gear, speed, rpm,
-                    tempOil, tempCoolant, tempGearbox, tempClutch, tempIntake, gpsLat, gpsLon,
+                    tempOil, tempCoolant, tempGearbox, tempClutch, tempIntake, tempExt, gpsLat, gpsLon,
                     relTime, gpsUpdated)
             resList.add(dataLine)
 
@@ -89,11 +95,11 @@ class RSMonitorReader : InputDataReader<DataLine> {
         dataLogger = logger
     }
 
-    private fun shortFromLittleEndian(bytes : ByteArray, firstIndex : Int)
+    private fun shortFromBigEndian(bytes : ByteArray, firstIndex : Int)
             = (((bytes[firstIndex + 1].toInt() and 0xFF) shl 8)
             or (bytes[firstIndex].toInt() and 0xFF)).toShort()
 
-    private fun shortFromBigEndian(bytes : ByteArray, firstIndex : Int)
+    private fun shortFromLittleEndian(bytes : ByteArray, firstIndex : Int)
             = (((bytes[firstIndex].toInt() and 0xFF) shl 8)
             or (bytes[firstIndex + 1].toInt() and 0xFF))
 
