@@ -41,6 +41,10 @@ class RSMonitorReader : InputDataReader<DataLine> {
         private const val MAGIC_NUMBER_ROTATION = 360
         private const val MAGIC_NUMBER_MILLION = 1000000
         private const val SPEED_CORRECTION_MAGIC_NUMBER = 122 //wut? ))
+
+        private const val INDEX_UNKNOWN1 = 0x50
+        private const val INDEX_UNKNOWN2 = 0x54
+        private const val INDEX_UNKNOWN3 = 0x58
     }
 
     private var dataLogger: InputDataLogger<DataLine> = NullDataLogger()
@@ -92,7 +96,13 @@ class RSMonitorReader : InputDataReader<DataLine> {
 
             val relTime  = 0.01 * intFromThreeBytes(lineBytes, INDEX_REL_TIME)
 
-            val dataLine = DataLine(throttlePercent, brakePressure, steeringAngle, gear, speed, rpm,
+            val unknown1 = intFromThreeBytes(lineBytes, INDEX_UNKNOWN1)
+            val unknown2 = intFromThreeBytes(lineBytes, INDEX_UNKNOWN2)
+            val unknown3 = intFromThreeBytes(lineBytes, INDEX_UNKNOWN3)
+
+
+            val dataLine = DataLine(unknown1, unknown2, unknown3,
+                    throttlePercent, brakePressure, steeringAngle, gear, speed, rpm,
                     tempOil, tempCoolant, tempGearbox, tempClutch, tempIntake, tempExt, gpsLat, gpsLon,
                     wheel_rr, wheel_rl, wheel_fr, wheel_fl,
                     relTime, gpsUpdated)
