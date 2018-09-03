@@ -26,6 +26,11 @@ class RSMonitorReader : InputDataReader<DataLine> {
         private const val INDEX_GPS_LAT = 0x5c
         private const val INDEX_GPS_LON = 0x60
 
+        private const val INDEX_WHEEL_RR = 0x74
+        private const val INDEX_WHEEL_RL = 0x79
+        private const val INDEX_WHEEL_FR = 0x7E
+        private const val INDEX_WHEEL_FL = 0x83
+
         private const val INDEX_TEMP_EXTERNAL = 0x93
 
         private const val INDEX_GEAR = 0x98
@@ -33,6 +38,8 @@ class RSMonitorReader : InputDataReader<DataLine> {
         private const val INDEX_REL_TIME = 0xA9
 
         private const val MAGIC_NUMBER = 6 //wut? ))
+        private const val MAGIC_NUMBER_ROTATION = 360
+        private const val MAGIC_NUMBER_MILLION = 1000000
         private const val SPEED_CORRECTION_MAGIC_NUMBER = 122 //wut? ))
     }
 
@@ -76,12 +83,18 @@ class RSMonitorReader : InputDataReader<DataLine> {
             prevGpsLon = gpsLon
 
             val rpmFromBytes = intFromThreeBytes(lineBytes, INDEX_RPM)
-            val rpm = if(rpmFromBytes != 0) MAGIC_NUMBER * 1000000 / rpmFromBytes else 0
+            val rpm = if(rpmFromBytes != 0) MAGIC_NUMBER * MAGIC_NUMBER_MILLION / rpmFromBytes else 0
+
+            val wheel_rr = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_RR))
+            val wheel_rl = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_RL))
+            val wheel_fr = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_FR))
+            val wheel_fl = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_FL))
 
             val relTime  = 0.01 * intFromThreeBytes(lineBytes, INDEX_REL_TIME)
 
             val dataLine = DataLine(throttlePercent, brakePressure, steeringAngle, gear, speed, rpm,
                     tempOil, tempCoolant, tempGearbox, tempClutch, tempIntake, tempExt, gpsLat, gpsLon,
+                    wheel_rr, wheel_rl, wheel_fr, wheel_fl,
                     relTime, gpsUpdated)
             resList.add(dataLine)
 
@@ -94,6 +107,9 @@ class RSMonitorReader : InputDataReader<DataLine> {
     override fun setDataLogger(logger: InputDataLogger<DataLine>) {
         dataLogger = logger
     }
+
+    private fun readWheel(readValue: Int) : Int
+            = if(readValue == 0) 0 else MAGIC_NUMBER_ROTATION * MAGIC_NUMBER_MILLION / readValue
 
     private fun shortFromBigEndian(bytes : ByteArray, firstIndex : Int)
             = (((bytes[firstIndex + 1].toInt() and 0xFF) shl 8)
