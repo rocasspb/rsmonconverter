@@ -48,10 +48,6 @@ class RSMonitorReader : InputDataReader<DataLine> {
         private const val MAGIC_NUMBER_FF = 256
         private const val MAGIC_NUMBER_MILLION = 1000000
         private const val SPEED_CORRECTION_MAGIC_NUMBER = 122 //wut? ))
-
-        private const val INDEX_UNKNOWN1 = 0x50
-        private const val INDEX_UNKNOWN2 = 0x54
-        private const val INDEX_UNKNOWN3 = 0x58
     }
 
     private var dataLogger: InputDataLogger<DataLine> = NullDataLogger()
@@ -96,13 +92,13 @@ class RSMonitorReader : InputDataReader<DataLine> {
             val rpmFromBytes = intFromThreeBytes(lineBytes, INDEX_RPM)
             val rpm = if (rpmFromBytes != 0) MAGIC_NUMBER * MAGIC_NUMBER_MILLION / rpmFromBytes else 0
 
-            val wheel_rr = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_RR))
-            val wheel_rl = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_RL))
-            val wheel_fr = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_FR))
-            val wheel_fl = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_FL))
+            val wheelRR = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_RR))
+            val wheelRL = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_RL))
+            val wheelFR = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_FR))
+            val wheelFL = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_FL))
 
-            val accel_lat = readAccel(lineBytes, INDEX_LATERAL)
-            val accel_lon = readAccel(lineBytes, INDEX_LONGITUDAL)
+            val accelLat = readAccel(lineBytes, INDEX_LATERAL)
+            val accelLon = readAccel(lineBytes, INDEX_LONGITUDAL)
 
             val relTime = 0.01 * intFromThreeBytes(lineBytes, INDEX_REL_TIME)
 
@@ -112,7 +108,7 @@ class RSMonitorReader : InputDataReader<DataLine> {
 
             val dataLine = DataLine(throttlePercent, brakePressure, steeringAngle, gear, speed, rpm,
                     tempOil, tempCoolant, tempGearbox, tempClutch, tempIntake, tempExt, gpsLat, gpsLon,
-                    wheel_rr, wheel_rl, wheel_fr, wheel_fl, accel_lat, accel_lon, boost, power, torque,
+                    wheelRR, wheelRL, wheelFR, wheelFL, accelLat, accelLon, boost, power, torque,
                     relTime, gpsUpdated)
             resList.add(dataLine)
 
