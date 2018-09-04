@@ -106,15 +106,13 @@ class RSMonitorReader : InputDataReader<DataLine> {
 
             val relTime = 0.01 * intFromThreeBytes(lineBytes, INDEX_REL_TIME)
 
-            val unknown1 = intFromThreeBytes(lineBytes, INDEX_UNKNOWN1)
-            val unknown2 = intFromThreeBytes(lineBytes, INDEX_UNKNOWN2)
-            val unknown3 = intFromThreeBytes(lineBytes, INDEX_UNKNOWN3)
+            val boost = 0.001 * shortFromLittleEndian(lineBytes, INDEX_BOOST)
+            val power = shortFromLittleEndian(lineBytes, INDEX_POWER)
+            val torque = shortFromLittleEndian(lineBytes, INDEX_TORQUE)
 
-
-            val dataLine = DataLine(unknown1, unknown2, unknown3,
-                    throttlePercent, brakePressure, steeringAngle, gear, speed, rpm,
+            val dataLine = DataLine(throttlePercent, brakePressure, steeringAngle, gear, speed, rpm,
                     tempOil, tempCoolant, tempGearbox, tempClutch, tempIntake, tempExt, gpsLat, gpsLon,
-                    wheel_rr, wheel_rl, wheel_fr, wheel_fl, accel_lat, accel_lon,
+                    wheel_rr, wheel_rl, wheel_fr, wheel_fl, accel_lat, accel_lon, boost, power, torque,
                     relTime, gpsUpdated)
             resList.add(dataLine)
 
@@ -135,10 +133,16 @@ class RSMonitorReader : InputDataReader<DataLine> {
         return res.toDouble() * sign / MAGIC_NUMBER_FF
     }
 
-    private fun readWheel(readValue: Int): Int = if (readValue == 0) 0 else MAGIC_NUMBER_ROTATION * MAGIC_NUMBER_MILLION / readValue
+    private fun readWheel(readValue: Int): Int
+            = if (readValue == 0) 0 else MAGIC_NUMBER_ROTATION * MAGIC_NUMBER_MILLION / readValue
 
-    private fun shortFromBigEndian(bytes: ByteArray, firstIndex: Int) = (((bytes[firstIndex + 1].toInt() and 0xFF) shl 8)
+    private fun shortFromBigEndian(bytes: ByteArray, firstIndex: Int)
+            = (((bytes[firstIndex + 1].toInt() and 0xFF) shl 8)
             or (bytes[firstIndex].toInt() and 0xFF)).toShort()
+
+    private fun shortFromLittleEndian(bytes : ByteArray, firstIndex : Int)
+            = (((bytes[firstIndex].toInt() and 0xFF) shl 8)
+            or (bytes[firstIndex + 1].toInt() and 0xFF))
 
     private fun intFromThreeBytes(bytes : ByteArray, firstIndex : Int) : Int =
             ((bytes[firstIndex].toInt() and 0xFF) shl 16) +
