@@ -18,8 +18,11 @@ class RSMonitorReader : InputDataReader<DataLine> {
         private const val INDEX_TEMP_CLUTCH = 0x31
 
         private const val INDEX_THROTTLE = 0x36
+        private const val INDEX_BOOST = 0x3B
         private const val INDEX_BRAKE = 0x42
         private const val INDEX_STEERING = 0x47
+        private const val INDEX_TORQUE = 0x50
+        private const val INDEX_POWER = 0x58
 
         private const val INDEX_RPM = 0x4B
 
