@@ -43,8 +43,8 @@ Potentially, this will allow to export the data to .VBO and load into the Circui
 main accepts two parameters: the filename of the original RS Monitor data log and the name of the output csv file
 
 ## Kudos
-- to @ravenstarter for elping me discovering some of the tricky values
-- to Mr. Sinelnikov for creating this awesome steering wheel overlay art :)
+- to @ravenstarter for helping me discovering some of the tricky values
+- to Mr. Sinelnikoff for creating this awesome steering wheel overlay art :)
 
 ## Disclaimers
 - this has only been tested with Clio RS Trophy - please send me the logs of other cars equipped with RS Monitor to check if the code works well
