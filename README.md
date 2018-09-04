@@ -13,24 +13,24 @@ Potentially, this will allow to export the data to .VBO and load into the Circui
 - Steering angle
 - RPM
 - Gear
+- Boost
+- Torque
+- Power
+- Individual wheel speeds
 - GPS Lat/Lon
 - Intake temp
 - Oil Temp
 - Coolant Temp
 - Gearbox Temp
 - Clutch Temp
+- External air temp
 
 ## Further plans
 - Data points
   - export temperatures
   - figure out accelerometer format
   - find other data points:
-   - Boost
-   - Torque
-   - Power
-   - Individual wheel speeds
-   - Yaw rate
-   - External air temp
+    - Yaw rate
 - Export
  - Add all known values to export
  - Support VBO format 
