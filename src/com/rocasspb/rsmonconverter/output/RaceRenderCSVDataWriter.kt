@@ -29,10 +29,14 @@ class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWrite
             writeField(formatDoubleDefault(brakePressure), output)
             writeField(steeringAngle.toString(), output)
 
+            writeField(formatDoubleDefault(accelLat), output)
+            writeField(formatDoubleDefault(accelLon), output)
+
             writeField(tempCoolant.toString(), output)
             writeField(tempOil.toString(), output)
             writeField(tempClutch.toString(), output)
             writeField(tempGearbox.toString(), output)
+            writeField(tempExternal.toString(), output)
             writeField(tempIntake.toString(), output, true)
         }
     }
@@ -61,10 +65,14 @@ class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWrite
         writeField("\"Brake Pedal *OBD\"", output)
         writeField("\"Steering angle *OBD\"", output)
 
+        writeField("\"Acceleration Lateral *OBD\"", output)
+        writeField("\"Acceleration Longitudinal *OBD\"", output)
+
         writeField("\"Temp Coolant *OBD\"", output)
         writeField("\"Temp Oil *OBD\"", output)
         writeField("\"Temp Clutch *OBD\"", output)
         writeField("\"Temp Gearbox *OBD\"", output)
+        writeField("\"Temp External *OBD\"", output)
         writeField("\"Temp Intake *OBD\"", output, true)
     }
 }
