@@ -10,6 +10,9 @@ class RSMonitorReader : InputDataReader<DataLine> {
     companion object {
         private const val LINE_LENGTH = 183
 
+        private const val INDEX_LATERAL = 0x11
+        private const val INDEX_LONGITUDAL = 0x13
+
         private const val INDEX_SPEED = 0x17
         private const val INDEX_TEMP_INTAKE = 0x1d
         private const val INDEX_TEMP_COOLANT = 0x22
@@ -42,6 +45,7 @@ class RSMonitorReader : InputDataReader<DataLine> {
 
         private const val MAGIC_NUMBER = 6 //wut? ))
         private const val MAGIC_NUMBER_ROTATION = 360
+        private const val MAGIC_NUMBER_FF = 256
         private const val MAGIC_NUMBER_MILLION = 1000000
         private const val SPEED_CORRECTION_MAGIC_NUMBER = 122 //wut? ))
 
@@ -66,9 +70,9 @@ class RSMonitorReader : InputDataReader<DataLine> {
             dataLogger.logData(lineBytes)
 
             val throttlePercent = shortFromBigEndian(lineBytes, INDEX_THROTTLE) / 10
-            val brakePressure =  0.01 * shortFromBigEndian(lineBytes, INDEX_BRAKE)
+            val brakePressure = 0.01 * shortFromBigEndian(lineBytes, INDEX_BRAKE)
             var steeringAngle = shortFromBigEndian(lineBytes, INDEX_STEERING) / 10
-            if(Math.abs(steeringAngle) == 3276) //sometimes there is 0x0800 instead of 0. Can't figure out, why
+            if (Math.abs(steeringAngle) == 3276) //sometimes there is 0x0800 instead of 0. Can't figure out, why
                 steeringAngle = 0
 
             val gear = lineBytes[INDEX_GEAR]
@@ -90,14 +94,17 @@ class RSMonitorReader : InputDataReader<DataLine> {
             prevGpsLon = gpsLon
 
             val rpmFromBytes = intFromThreeBytes(lineBytes, INDEX_RPM)
-            val rpm = if(rpmFromBytes != 0) MAGIC_NUMBER * MAGIC_NUMBER_MILLION / rpmFromBytes else 0
+            val rpm = if (rpmFromBytes != 0) MAGIC_NUMBER * MAGIC_NUMBER_MILLION / rpmFromBytes else 0
 
             val wheel_rr = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_RR))
             val wheel_rl = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_RL))
             val wheel_fr = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_FR))
             val wheel_fl = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_FL))
 
-            val relTime  = 0.01 * intFromThreeBytes(lineBytes, INDEX_REL_TIME)
+            val accel_lat = readAccel(lineBytes, INDEX_LATERAL)
+            val accel_lon = readAccel(lineBytes, INDEX_LONGITUDAL)
+
+            val relTime = 0.01 * intFromThreeBytes(lineBytes, INDEX_REL_TIME)
 
             val unknown1 = intFromThreeBytes(lineBytes, INDEX_UNKNOWN1)
             val unknown2 = intFromThreeBytes(lineBytes, INDEX_UNKNOWN2)
@@ -107,7 +114,7 @@ class RSMonitorReader : InputDataReader<DataLine> {
             val dataLine = DataLine(unknown1, unknown2, unknown3,
                     throttlePercent, brakePressure, steeringAngle, gear, speed, rpm,
                     tempOil, tempCoolant, tempGearbox, tempClutch, tempIntake, tempExt, gpsLat, gpsLon,
-                    wheel_rr, wheel_rl, wheel_fr, wheel_fl,
+                    wheel_rr, wheel_rl, wheel_fr, wheel_fl, accel_lat, accel_lon,
                     relTime, gpsUpdated)
             resList.add(dataLine)
 
@@ -121,16 +128,17 @@ class RSMonitorReader : InputDataReader<DataLine> {
         dataLogger = logger
     }
 
-    private fun readWheel(readValue: Int) : Int
-            = if(readValue == 0) 0 else MAGIC_NUMBER_ROTATION * MAGIC_NUMBER_MILLION / readValue
+    fun readAccel(lineBytes: ByteArray, index: Int): Double {
+        val sign = if(lineBytes[index].toInt() and 0x80 == 0) -1 else 1
+        val res = (((lineBytes[index].toInt() and 0x7F) shl 8)
+            or (lineBytes[index + 1].toInt() and 0xFF))
+        return res.toDouble() * sign / MAGIC_NUMBER_FF
+    }
 
-    private fun shortFromBigEndian(bytes : ByteArray, firstIndex : Int)
-            = (((bytes[firstIndex + 1].toInt() and 0xFF) shl 8)
+    private fun readWheel(readValue: Int): Int = if (readValue == 0) 0 else MAGIC_NUMBER_ROTATION * MAGIC_NUMBER_MILLION / readValue
+
+    private fun shortFromBigEndian(bytes: ByteArray, firstIndex: Int) = (((bytes[firstIndex + 1].toInt() and 0xFF) shl 8)
             or (bytes[firstIndex].toInt() and 0xFF)).toShort()
-
-    private fun shortFromLittleEndian(bytes : ByteArray, firstIndex : Int)
-            = (((bytes[firstIndex].toInt() and 0xFF) shl 8)
-            or (bytes[firstIndex + 1].toInt() and 0xFF))
 
     private fun intFromThreeBytes(bytes : ByteArray, firstIndex : Int) : Int =
             ((bytes[firstIndex].toInt() and 0xFF) shl 16) +

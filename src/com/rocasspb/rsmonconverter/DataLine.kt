@@ -11,6 +11,7 @@ data class DataLine(var unknown1: Int = 0, var unknown2: Int = 0, var unknown3: 
                     var gpsLat : Double = 0.0, var gpsLon : Double = 0.0,
                     var wheel_rr: Int = 0, var wheel_rl: Int = 0,
                     var wheel_fr: Int = 0, var wheel_fl: Int = 0,
+                    var accelLat: Double = 0.0, var accelLon: Double = 0.0,
                     val relativeTime: Double = 0.0, val gpsUpdate : Boolean = false)
         
 
