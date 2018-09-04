@@ -29,6 +29,10 @@ class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWrite
             writeField(formatDoubleDefault(brakePressure), output)
             writeField(steeringAngle.toString(), output)
 
+            writeField(formatDoubleDefault(boost), output)
+            writeField(power.toString(), output)
+            writeField(torque.toString(), output)
+
             writeField(formatDoubleDefault(accelLat), output)
             writeField(formatDoubleDefault(accelLon), output)
 
@@ -64,6 +68,10 @@ class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWrite
         writeField("\"Accelerator Pedal (%) *OBD\"", output)
         writeField("\"Brake Pedal *OBD\"", output)
         writeField("\"Steering angle *OBD\"", output)
+
+        writeField("\"Boost *OBD\"", output)
+        writeField("\"Power *OBD\"", output)
+        writeField("\"Torque *OBD\"", output)
 
         writeField("\"Acceleration Lateral *OBD\"", output)
         writeField("\"Acceleration Longitudinal *OBD\"", output)
