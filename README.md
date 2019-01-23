@@ -40,7 +40,12 @@ Potentially, this will allow to export the data to .VBO and load into the Circui
  - Write proper tests
 
 ## Basic usage
-main accepts two parameters: the filename of the original RS Monitor data log and the name of the output csv file
+main accepts either one or two parameters: 
+- Single parameter is considered as a source path
+    - if it is a file, the output file will have the same name and .csv extension
+    - if it is a folder, all the files with .run extension will be converted
+- Two parameters: the filename of the original RS Monitor data log and the name of the output csv file
+
 
 ## Kudos
 - to @ravenstarter for helping me discovering some of the tricky values
