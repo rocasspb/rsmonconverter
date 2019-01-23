@@ -23,7 +23,9 @@ class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWrite
             writeField(1.toString(), output)
             writeField(formatDoubleDefault(gpsLat, 7), output)
             writeField(formatDoubleDefault(gpsLon, 7), output)
+
             writeField(formatDoubleDefault(speed), output)
+            writeField(gear.toString(), output)
             writeField(rpm.toString(), output)
             writeField(throttlePercent.toString(), output)
             writeField(formatDoubleDefault(brakePressure), output)
@@ -63,7 +65,9 @@ class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWrite
         writeField("\"OBD_Update\"", output)
         writeField("\"Latitude\"", output)
         writeField("\"Longitude\"", output)
+
         writeField("\"Speed (KPH) *OBD\"", output)
+        writeField("\"Gear *OBD\"", output)
         writeField("\"Engine Speed (RPM) *OBD\"", output)
         writeField("\"Accelerator Pedal (%) *OBD\"", output)
         writeField("\"Brake Pedal *OBD\"", output)
