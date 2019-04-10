@@ -2,6 +2,7 @@ package com.rocasspb.rsmonconverter.output
 
 import com.rocasspb.rsmonconverter.DataLine
 import java.io.PrintWriter
+import java.util.*
 
 class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWriter<DataLine> {
     override fun writeDataToStream(dataList: List<DataLine>) {
@@ -47,7 +48,7 @@ class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWrite
         }
     }
 
-    private fun formatDoubleDefault(double: Double, precision: Int = 2) = String.format("%." + precision + "f", double)
+    private fun formatDoubleDefault(double: Double, precision: Int = 2) = String.format(Locale.ROOT, "%." + precision + "f", double)
 
     private fun writeField(fieldText: String, output: PrintWriter, isLast: Boolean = false) {
         val ending = if (isLast) "\n" else ","
