@@ -60,7 +60,7 @@ class RSMonitorReader : InputDataReader<DataLine> {
         var prevGpsLat = 0.0
         var prevGpsLon = 0.0
 
-        while (bytes.available() > LINE_LENGTH) {
+        while (bytes.available() >= LINE_LENGTH) {
             bytes.read(lineBytes)
 
             dataLogger.logData(lineBytes)
