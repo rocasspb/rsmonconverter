@@ -1,12 +1,13 @@
 package com.rocasspb.rsmonconverter.input
 
-import com.rocasspb.rsmonconverter.DataLine
+import com.rocasspb.rsmonconverter.field.*
 import com.rocasspb.rsmonconverter.logging.InputDataLogger
 import com.rocasspb.rsmonconverter.logging.NullDataLogger
 import java.io.ByteArrayInputStream
 import java.util.*
+import kotlin.collections.HashMap
 
-class RSMonitorReader : InputDataReader<DataLine> {
+class RSMonitorReader : InputDataReader<Map<FieldEnum, Field<Any>>> {
     companion object {
         private const val LINE_LENGTH = 183
 
@@ -50,11 +51,11 @@ class RSMonitorReader : InputDataReader<DataLine> {
         private const val SPEED_CORRECTION_MAGIC_NUMBER = 122 //wut? ))
     }
 
-    private var dataLogger: InputDataLogger<DataLine> = NullDataLogger()
+    private var dataLogger: InputDataLogger<Map<FieldEnum, Field<Any>>> = NullDataLogger()
 
-    override fun readFromBytes(bytes: ByteArrayInputStream): List<DataLine> {
+    override fun readFromBytes(bytes: ByteArrayInputStream): List<Map<FieldEnum, Field<Any>>> {
         val lineBytes = ByteArray(LINE_LENGTH)
-        val resList = LinkedList<DataLine>()
+        val resList = LinkedList<Map<FieldEnum, Field<Any>>>()
 
         //todo this is temporary until we are not counting time in reality. We assume updates in 10Hz
         var prevGpsLat = 0.0
@@ -65,21 +66,30 @@ class RSMonitorReader : InputDataReader<DataLine> {
 
             dataLogger.logData(lineBytes)
 
-            val throttlePercent = shortFromBigEndian(lineBytes, INDEX_THROTTLE) / 10
-            val brakePressure = 0.01 * shortFromBigEndian(lineBytes, INDEX_BRAKE)
+            val map = HashMap<FieldEnum, Field<Any>>()
+
+            map[FieldEnum.OBD_UPD] = BooleanField(true)
+            map[FieldEnum.OBD_THROTTLE_PERCENT] =
+                    IntField(shortFromBigEndian(lineBytes, INDEX_THROTTLE) / 10)
+            map[FieldEnum.OBD_BRAKE_PRESSURE] =
+                    DoubleField(0.01 * shortFromBigEndian(lineBytes, INDEX_BRAKE))
+
             var steeringAngle = shortFromBigEndian(lineBytes, INDEX_STEERING) / 10
             if (Math.abs(steeringAngle) == 3276) //sometimes there is 0x0800 instead of 0. Can't figure out, why
                 steeringAngle = 0
 
-            val gear = lineBytes[INDEX_GEAR]
-            val speed: Double = intFromThreeBytes(lineBytes, INDEX_SPEED).toDouble() / MAGIC_NUMBER / SPEED_CORRECTION_MAGIC_NUMBER
+            map[FieldEnum.OBD_STEERING_ANGLE] = IntField(steeringAngle)
 
-            val tempIntake = shortFromBigEndian(lineBytes, INDEX_TEMP_INTAKE) / 10
-            val tempCoolant = shortFromBigEndian(lineBytes, INDEX_TEMP_COOLANT) / 10
-            val tempOil = shortFromBigEndian(lineBytes, INDEX_TEMP_OIL) / 10
-            val tempGearbox = shortFromBigEndian(lineBytes, INDEX_TEMP_GEARBOX) / 10
-            val tempClutch = shortFromBigEndian(lineBytes, INDEX_TEMP_CLUTCH) / 10
-            val tempExt = shortFromBigEndian(lineBytes, INDEX_TEMP_EXTERNAL) / 10
+            map[FieldEnum.OBD_GEAR] = ByteField(lineBytes[INDEX_GEAR])
+            map[FieldEnum.OBD_SPEED] = DoubleField(
+                    intFromThreeBytes(lineBytes, INDEX_SPEED).toDouble() / MAGIC_NUMBER / SPEED_CORRECTION_MAGIC_NUMBER)
+
+            map[FieldEnum.OBD_TEMP_INTAKE] = IntField(shortFromBigEndian(lineBytes, INDEX_TEMP_INTAKE) / 10)
+            map[FieldEnum.OBD_TEMP_COOLANT] = IntField(shortFromBigEndian(lineBytes, INDEX_TEMP_COOLANT) / 10)
+            map[FieldEnum.OBD_TEMP_OIL] = IntField(shortFromBigEndian(lineBytes, INDEX_TEMP_OIL) / 10)
+            map[FieldEnum.OBD_TEMP_GEARBOX] = IntField(shortFromBigEndian(lineBytes, INDEX_TEMP_GEARBOX) / 10)
+            map[FieldEnum.OBD_TEMP_CLUTCH] = IntField(shortFromBigEndian(lineBytes, INDEX_TEMP_CLUTCH) / 10)
+            map[FieldEnum.OBD_TEMP_EXT] = IntField(shortFromBigEndian(lineBytes, INDEX_TEMP_EXTERNAL) / 10)
 
             val gpsLon = 0.0000001 * intFromFourBytes(lineBytes, INDEX_GPS_LAT)
             val gpsLat = 0.0000001 * intFromFourBytes(lineBytes, INDEX_GPS_LON)
@@ -88,37 +98,37 @@ class RSMonitorReader : InputDataReader<DataLine> {
             val gpsUpdated = !(gpsLat == prevGpsLat && gpsLon == prevGpsLon)
             prevGpsLat = gpsLat
             prevGpsLon = gpsLon
+            map[FieldEnum.GPS_LON] = LatLonField(gpsLon)
+            map[FieldEnum.GPS_LAT] = LatLonField(gpsLat)
+            map[FieldEnum.GPS_UPD] = BooleanField(gpsUpdated)
 
             val rpmFromBytes = intFromThreeBytes(lineBytes, INDEX_RPM)
             val rpm = if (rpmFromBytes != 0) MAGIC_NUMBER * MAGIC_NUMBER_MILLION / rpmFromBytes else 0
+            map[FieldEnum.OBD_RPM] = IntField(rpm)
 
-            val wheelRR = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_RR))
-            val wheelRL = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_RL))
-            val wheelFR = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_FR))
-            val wheelFL = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_FL))
+            map[FieldEnum.OBD_WHEEL_RR] = IntField(readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_RR)))
+            map[FieldEnum.OBD_WHEEL_RL] = IntField(readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_RL)))
+            map[FieldEnum.OBD_WHEEL_FR] = IntField(readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_FR)))
+            map[FieldEnum.OBD_WHEEL_FL] = IntField(readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_FL)))
 
-            val accelLat = readAccel(lineBytes, INDEX_LATERAL)
-            val accelLon = readAccel(lineBytes, INDEX_LONGITUDAL)
+            map[FieldEnum.ACCEL_LAT] = DoubleField(readAccel(lineBytes, INDEX_LATERAL))
+            map[FieldEnum.ACCEL_LON] = DoubleField(-readAccel(lineBytes, INDEX_LONGITUDAL))
 
-            val relTime = 0.01 * intFromThreeBytes(lineBytes, INDEX_REL_TIME)
+            map[FieldEnum.REL_TIME] = DoubleField(0.01 * intFromThreeBytes(lineBytes, INDEX_REL_TIME))
 
-            val boost = 0.001 * shortFromLittleEndian(lineBytes, INDEX_BOOST)
-            val power = shortFromLittleEndian(lineBytes, INDEX_POWER)
-            val torque = shortFromLittleEndian(lineBytes, INDEX_TORQUE)
+            map[FieldEnum.OBD_BOOST] = DoubleField(0.001 * shortFromLittleEndian(lineBytes, INDEX_BOOST))
+            map[FieldEnum.OBD_TORQUE] = IntField(shortFromLittleEndian(lineBytes, INDEX_TORQUE))
+            map[FieldEnum.OBD_POWER] = IntField(shortFromLittleEndian(lineBytes, INDEX_POWER))
 
-            val dataLine = DataLine(throttlePercent, brakePressure, steeringAngle, gear, speed, rpm,
-                    tempOil, tempCoolant, tempGearbox, tempClutch, tempIntake, tempExt, gpsLat, gpsLon,
-                    wheelRR, wheelRL, wheelFR, wheelFL, accelLat, accelLon, boost, power, torque,
-                    relTime, gpsUpdated)
-            resList.add(dataLine)
+            resList.add(map)
 
-            dataLogger.logResult(dataLine)
+            dataLogger.logResult(map)
         }
 
         return resList
     }
 
-    override fun setDataLogger(logger: InputDataLogger<DataLine>) {
+    override fun setDataLogger(logger: InputDataLogger<Map<FieldEnum, Field<Any>>>) {
         dataLogger = logger
     }
 

@@ -1,6 +1,6 @@
 package com.rocasspb.rsmonconverter.output
 
-import com.rocasspb.rsmonconverter.DataLine
+import com.rocasspb.rsmonconverter.field.*
 import java.io.PrintWriter
 import java.util.*
 
@@ -74,43 +74,12 @@ class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWrite
         output.close()
     }
 
-    private fun writeData(dataLine: DataLine, output: PrintWriter) {
+    fun writeData(dataLine: Map<FieldEnum, Field<Any>>, output: PrintWriter) {
         with(dataLine) {
-            writeField(formatDoubleDefault(relativeTime), output)
-            writeField((if (gpsUpdate) 1 else 0).toString(), output)
-
-            writeField(1.toString(), output)
-            writeField(formatDoubleDefault(gpsLat, 7), output)
-            writeField(formatDoubleDefault(gpsLon, 7), output)
-
-            writeField(formatDoubleDefault(speed), output)
-            writeField(gear.toString(), output)
-            writeField(rpm.toString(), output)
-            writeField(throttlePercent.toString(), output)
-            writeField(formatDoubleDefault(brakePressure), output)
-            writeField(steeringAngle.toString(), output)
-
-            writeField(formatDoubleDefault(boost), output)
-            writeField(power.toString(), output)
-            writeField(torque.toString(), output)
-
-            writeField(formatDoubleDefault(accelLat), output)
-            writeField(formatDoubleDefault(accelLon), output)
-
-            writeField(tempCoolant.toString(), output)
-            writeField(tempOil.toString(), output)
-            writeField(tempClutch.toString(), output)
-            writeField(tempGearbox.toString(), output)
-            writeField(tempExternal.toString(), output)
-            writeField(tempIntake.toString(), output, true)
+            val line = fields.joinToString(separator = ",", postfix = "\n")
+                { RRCSVValueVisitor().visit(dataLine[it]!!)}
+            output.print(line)
         }
-    }
-
-    private fun formatDoubleDefault(double: Double, precision: Int = 2) = String.format(Locale.ROOT, "%." + precision + "f", double)
-
-    private fun writeField(fieldText: String, output: PrintWriter, isLast: Boolean = false) {
-        val ending = if (isLast) "\n" else ","
-        output.print(fieldText + ending)
     }
 
     private fun writeHeader(output: PrintWriter) {
@@ -118,32 +87,22 @@ class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWrite
     }
 
     private fun writeDataTableHeader(output: PrintWriter) {
-        //todo - move to dataLine, make hashmap
-        writeField("\"Time\"", output)
-        writeField("\"GPS_Update\"", output)
-        writeField("\"OBD_Update\"", output)
-        writeField("\"Latitude\"", output)
-        writeField("\"Longitude\"", output)
+        val line = fields.joinToString( separator = ",", postfix = "\n" ) {headerLabelByFieldEnum(it)!!}
+        output.print(line)
+    }
 
-        writeField("\"Speed (KPH) *OBD\"", output)
-        writeField("\"Gear *OBD\"", output)
-        writeField("\"Engine Speed (RPM) *OBD\"", output)
-        writeField("\"Accelerator Pedal (%) *OBD\"", output)
-        writeField("\"Brake Pedal *OBD\"", output)
-        writeField("\"Steering angle *OBD\"", output)
+    private fun headerLabelByFieldEnum(enum: FieldEnum) = fieldToLabelMap[enum]
+}
 
-        writeField("\"Boost *OBD\"", output)
-        writeField("\"Power *OBD\"", output)
-        writeField("\"Torque *OBD\"", output)
-
-        writeField("\"Acceleration Lateral *OBD\"", output)
-        writeField("\"Acceleration Longitudinal *OBD\"", output)
-
-        writeField("\"Temp Coolant *OBD\"", output)
-        writeField("\"Temp Oil *OBD\"", output)
-        writeField("\"Temp Clutch *OBD\"", output)
-        writeField("\"Temp Gearbox *OBD\"", output)
-        writeField("\"Temp External *OBD\"", output)
-        writeField("\"Temp Intake *OBD\"", output, true)
+class RRCSVValueVisitor : FieldVisitor<String> {
+    override fun <T> visit(field: Field<T>) : String = when(field){
+            is LatLonField -> formatDoubleDefault(field.value, 7)
+            is DoubleField -> formatDoubleDefault(field.value)
+            is IntField -> field.value.toString()
+            is ByteField -> field.value.toString()
+            is BooleanField -> if(field.value) 1.toString() else 0.toString()
     }
 }
+
+private fun formatDoubleDefault(double: Double, precision: Int = 2) = String.format(Locale.ROOT, "%." + precision + "f", double)
+
