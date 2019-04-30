@@ -116,7 +116,7 @@ class RSMonitorReader : InputDataReader<Map<FieldEnum, Field<Any>>> {
 
             map[FieldEnum.REL_TIME] = DoubleField(0.01 * intFromThreeBytes(lineBytes, INDEX_REL_TIME))
 
-            map[FieldEnum.OBD_BOOST] = DoubleField(0.001 * shortFromLittleEndian(lineBytes, INDEX_BOOST))
+            map[FieldEnum.OBD_BOOST] = IntField(shortFromLittleEndian(lineBytes, INDEX_BOOST) * 5)
             map[FieldEnum.OBD_TORQUE] = IntField(shortFromLittleEndian(lineBytes, INDEX_TORQUE))
             map[FieldEnum.OBD_POWER] = IntField(shortFromLittleEndian(lineBytes, INDEX_POWER))
 

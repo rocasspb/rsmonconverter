@@ -31,7 +31,13 @@ class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWrite
             FieldEnum.OBD_TEMP_CLUTCH,
             FieldEnum.OBD_TEMP_GEARBOX,
             FieldEnum.OBD_TEMP_EXT,
-            FieldEnum.OBD_TEMP_INTAKE)
+            FieldEnum.OBD_TEMP_INTAKE
+
+            /*FieldEnum.OBD_WHEEL_FL,
+            FieldEnum.OBD_WHEEL_FR,
+            FieldEnum.OBD_WHEEL_RL,
+            FieldEnum.OBD_WHEEL_RR*/
+    )
 
     private val fieldToLabelMap = hashMapOf(
             FieldEnum.REL_TIME to "\"Time\"",

@@ -10,7 +10,7 @@ data class DataLine(var throttlePercent : Int = 0, var brakePressure : Double = 
                     var wheelRR: Int = 0, var wheelRL: Int = 0,
                     var wheelFR: Int = 0, var wheelFL: Int = 0,
                     var accelLat: Double = 0.0, var accelLon: Double = 0.0,
-                    var boost: Double = 0.0, var power: Int = 0, var torque: Int = 0,
+                    var boost: Int = 0, var power: Int = 0, var torque: Int = 0,
                     val relativeTime: Double = 0.0, val gpsUpdate : Boolean = false)
         
 
