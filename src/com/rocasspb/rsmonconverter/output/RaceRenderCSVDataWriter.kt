@@ -4,41 +4,7 @@ import com.rocasspb.rsmonconverter.field.*
 import java.io.PrintWriter
 import java.util.*
 
-class RaceRenderCSVDataWriter(private val output: PrintWriter) : OutputDataWriter<Map<FieldEnum, Field<Any>>> {
-    private val fields = listOf(
-            FieldEnum.REL_TIME,
-            FieldEnum.GPS_UPD,
-            FieldEnum.OBD_UPD,
-            FieldEnum.GPS_LAT,
-            FieldEnum.GPS_LON,
-
-            FieldEnum.OBD_SPEED,
-            FieldEnum.OBD_GEAR,
-            FieldEnum.OBD_RPM,
-            FieldEnum.OBD_THROTTLE_PERCENT,
-            FieldEnum.OBD_BRAKE_PRESSURE,
-            FieldEnum.OBD_STEERING_ANGLE,
-
-            FieldEnum.OBD_BOOST,
-            FieldEnum.OBD_POWER,
-            FieldEnum.OBD_TORQUE,
-
-            FieldEnum.ACCEL_LAT,
-            FieldEnum.ACCEL_LON,
-
-            FieldEnum.OBD_TEMP_COOLANT,
-            FieldEnum.OBD_TEMP_OIL,
-            FieldEnum.OBD_TEMP_CLUTCH,
-            FieldEnum.OBD_TEMP_GEARBOX,
-            FieldEnum.OBD_TEMP_EXT,
-            FieldEnum.OBD_TEMP_INTAKE
-
-            /*FieldEnum.OBD_WHEEL_FL,
-            FieldEnum.OBD_WHEEL_FR,
-            FieldEnum.OBD_WHEEL_RL,
-            FieldEnum.OBD_WHEEL_RR*/
-    )
-
+class RaceRenderCSVDataWriter(private val output: PrintWriter, private val fields: List<FieldEnum>) : OutputDataWriter<Map<FieldEnum, Field<Any>>> {
     private val fieldToLabelMap = hashMapOf(
             FieldEnum.REL_TIME to "\"Time\"",
             FieldEnum.GPS_UPD to "\"GPS_Update\"",

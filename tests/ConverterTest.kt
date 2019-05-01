@@ -59,6 +59,40 @@ class ConverterTest {
 
     @Test
     fun testDataWriter() {
+        val fields = listOf(
+                FieldEnum.REL_TIME,
+                FieldEnum.GPS_UPD,
+                FieldEnum.OBD_UPD,
+                FieldEnum.GPS_LAT,
+                FieldEnum.GPS_LON,
+
+                FieldEnum.OBD_SPEED,
+                FieldEnum.OBD_GEAR,
+                FieldEnum.OBD_RPM,
+                FieldEnum.OBD_THROTTLE_PERCENT,
+                FieldEnum.OBD_BRAKE_PRESSURE,
+                FieldEnum.OBD_STEERING_ANGLE,
+
+                FieldEnum.OBD_BOOST,
+                FieldEnum.OBD_POWER,
+                FieldEnum.OBD_TORQUE,
+
+                FieldEnum.ACCEL_LAT,
+                FieldEnum.ACCEL_LON,
+
+                FieldEnum.OBD_TEMP_COOLANT,
+                FieldEnum.OBD_TEMP_OIL,
+                FieldEnum.OBD_TEMP_CLUTCH,
+                FieldEnum.OBD_TEMP_GEARBOX,
+                FieldEnum.OBD_TEMP_EXT,
+                FieldEnum.OBD_TEMP_INTAKE
+
+                /*FieldEnum.OBD_WHEEL_FL,
+                FieldEnum.OBD_WHEEL_FR,
+                FieldEnum.OBD_WHEEL_RL,
+                FieldEnum.OBD_WHEEL_RR*/
+        )
+
         val map = HashMap<FieldEnum, Field<Any>>()
         map[FieldEnum.OBD_UPD] = BooleanField(true)
         map[FieldEnum.OBD_THROTTLE_PERCENT] = IntField(27)
@@ -98,7 +132,7 @@ class ConverterTest {
 
         val writer = StringWriter()
 
-        val dataWriter = RaceRenderCSVDataWriter(PrintWriter(writer))
+        val dataWriter = RaceRenderCSVDataWriter(PrintWriter(writer), fields)
         dataWriter.writeData(map, PrintWriter(writer))
         assertEquals(expectedResult, writer.toString())
     }
