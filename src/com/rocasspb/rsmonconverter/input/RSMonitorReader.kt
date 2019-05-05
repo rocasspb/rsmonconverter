@@ -106,10 +106,17 @@ class RSMonitorReader : InputDataReader<Map<FieldEnum, Field<Any>>> {
             val rpm = if (rpmFromBytes != 0) MAGIC_NUMBER * MAGIC_NUMBER_MILLION / rpmFromBytes else 0
             map[FieldEnum.OBD_RPM] = IntField(rpm)
 
-            map[FieldEnum.OBD_WHEEL_RR] = IntField(readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_RR)))
-            map[FieldEnum.OBD_WHEEL_RL] = IntField(readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_RL)))
-            map[FieldEnum.OBD_WHEEL_FR] = IntField(readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_FR)))
-            map[FieldEnum.OBD_WHEEL_FL] = IntField(readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_FL)))
+            val rr = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_RR))
+            val rl = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_RL))
+            val fr = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_FR))
+            val fl = readWheel(intFromThreeBytes(lineBytes, INDEX_WHEEL_FL))
+
+            val avg = arrayOf(rr, rl, fr, fl).average().toInt()
+
+            map[FieldEnum.OBD_WHEEL_RR] = IntField(rr - avg)
+            map[FieldEnum.OBD_WHEEL_RL] = IntField(rl - avg)
+            map[FieldEnum.OBD_WHEEL_FR] = IntField(fr - avg)
+            map[FieldEnum.OBD_WHEEL_FL] = IntField(fl - avg)
 
             map[FieldEnum.ACCEL_LAT] = DoubleField(readAccel(lineBytes, INDEX_LATERAL))
             map[FieldEnum.ACCEL_LON] = DoubleField(-readAccel(lineBytes, INDEX_LONGITUDAL))
