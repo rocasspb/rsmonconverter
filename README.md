@@ -1,6 +1,9 @@
 # RSMonConverter
 Converter for RS Monitor data logs for RenaultSport cars.
 
+## NB! THE PROJECT IS NOT CURRENTLY SUPPORTED - PLEASE READ!
+After building the first version of the code I've reached out to [Racechrono](https://racechrono.com/) asking if they can support importing the .run files. They did not use my code, but were able to quickly build this feature themselves - and now my project seems obsolete. If you do have a Renaultsport car and want to analyze your data or overlay it on top of the onboard videos - I recommend you buying *Racechrono Pro* and using it's Import feature. At least that's what I do myself.
+
 ## Description
 First take on this task: the code can extract most of the values from the .run file and export these values as [RaceRender CSV](http://racerender.com/Developer/DataFormat.html)
 For now, this allows to overlay the RS Monitor data over an onboard video. [Click here to see a sample](https://youtu.be/NIescnEe7I0)
